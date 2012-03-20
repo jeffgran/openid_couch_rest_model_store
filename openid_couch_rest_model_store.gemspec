@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{openid_couch_rest_model_store}
-  s.version = "1.0.0"
+  s.version = "1.0.1"
   s.authors = ['James Tucker', 'Kazuyoshi Tlacaelel', 'Jeff Gran']
   s.email = 'info@wildfireapp.com'
   s.homepage = 'http://github.com/jeffgran/openid_couch_rest_model_store'
@@ -19,11 +19,17 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency("rails", [">= 3"])
+      s.add_runtime_dependency("rails", ["~> 3"])
+      s.add_runtime_dependency("ruby-openid")
+      s.add_runtime_dependency("couchrest_model", ["~> 1.0"])
     else
-      s.add_dependency("rails", [">= 3"])
+      s.add_dependency("rails", ["~> 3"])
+      s.add_dependency("ruby-openid")
+      s.add_dependency("couchrest_model", ["~> 1.0"])
     end
   else
-    s.add_dependency("rails", [">= 3"])
+    s.add_dependency("rails", ["~> 3"])
+    s.add_dependency("ruby-openid")   
+    s.add_dependency("couchrest_model", ["~> 1.0"])
   end
 end
