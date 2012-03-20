@@ -1,4 +1,5 @@
 require 'rails/engine'
+require 'openid/store/couch_rest_model'
 
 module OpenidCouchRestModelStore
   class Engine < Rails::Engine
