@@ -41,7 +41,7 @@ class OpenidStoreCouchRestModelTest < ActiveSupport::TestCase
   end
 
   def _gen_assoc(issued_at, lifetime=600)
-    secret = _gen_secret(20, @@allowed_handle)
+    secret = _gen_secret(20)
     handle = _gen_handle(128)
     OpenID::Association.new(handle, secret, Time.now + issued_at, lifetime,
                             'HMAC-SHA1')

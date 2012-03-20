@@ -16,7 +16,7 @@ module OpenID
           :server_url => server_url,
           :target     => targetize(server_url),
           :handle     => association.handle,
-          :secret     => association.secret,
+          :secret     => OpenID::Util.to_base64(association.secret),
           :issued_at  => association.issued,
           :lifetime   => association.lifetime,
           :assoc_type => association.assoc_type
@@ -99,7 +99,7 @@ module OpenID
       def build_association(open_id_association)
         OpenID::Association.new(
           open_id_association.handle,
-          open_id_association.secret,
+          OpenID::Util.from_base64(open_id_association.secret),
           open_id_association.issued_at,
           open_id_association.lifetime,
           open_id_association.assoc_type
