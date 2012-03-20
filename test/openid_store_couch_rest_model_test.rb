@@ -1,7 +1,6 @@
 require 'test_helper'
-require 'openid/store/nonce'
 
-class OpenidStoreActiveRecordTest < ActiveSupport::TestCase
+class OpenidStoreCouchRestModelTest < ActiveSupport::TestCase
 
   # ============================================================================
   # TESTING SCENARIO
@@ -11,7 +10,7 @@ class OpenidStoreActiveRecordTest < ActiveSupport::TestCase
   teardown :destroy_scenario
 
   def prepare_scenario
-    @store = OpenID::Store::ActiveRecord.new
+    @store = OpenID::Store::CouchRestModel.new
     @@allowed_nonce = '0123456789abcdefghijklmnopqrst' +
       'uvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     @@allowed_handle = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ' +
@@ -42,7 +41,7 @@ class OpenidStoreActiveRecordTest < ActiveSupport::TestCase
   end
 
   def _gen_assoc(issued_at, lifetime=600)
-    secret = _gen_secret(20)
+    secret = _gen_secret(20, @@allowed_handle)
     handle = _gen_handle(128)
     OpenID::Association.new(handle, secret, Time.now + issued_at, lifetime,
                             'HMAC-SHA1')
@@ -167,7 +166,7 @@ class OpenidStoreActiveRecordTest < ActiveSupport::TestCase
     @store.store_association(server_url + '2', assocExpired2)
     @store.store_association(server_url + '3', assocValid2)
 
-    cleaned = @store.cleanup_associations()
+    cleaned = @store.cleanup_associations().select{|n|n}.size
     assert_equal(2, cleaned, "cleaned up associations")
   end
 
@@ -220,7 +219,7 @@ class OpenidStoreActiveRecordTest < ActiveSupport::TestCase
 
 
     Nonce.skew = 1000
-    cleaned = @store.cleanup_nonces
+    cleaned = @store.cleanup_nonces.select{|n|n}.size
     assert_equal(2, cleaned, "Cleaned #{cleaned} nonces")
 
     Nonce.skew = 100000

@@ -1,8 +1,18 @@
-class OpenidNonce < OpenidAbstract
+class OpenidNonce < CouchRest::Model::Base
+  property  :timestamp, Integer
+  property  :salt, String
+  property  :target, String
+  property  :server_url, String
+  timestamps!
 
-  # attempt to scan timestamps (integers) first for fast access.
+  design do 
+    view :by_target
+  end
+
+  save_design_doc!
+
   def self.exists_by_target?(timestamp, salt, target)
-    where(:timestamp => timestamp, :target => target).size > 0
+    by_target(key: target).any?{|nonce| nonce.timestamp == timestamp}
   end
 
 end

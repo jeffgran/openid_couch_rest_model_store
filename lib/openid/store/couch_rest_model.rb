@@ -5,7 +5,7 @@ require 'openssl'
 
 module OpenID
   module Store
-    class ActiveRecord < Interface
+    class CouchRestModel < Interface
 
       # Put a Association object into storage.
       # When implementing a store, don't assume that there are any limitations
@@ -29,7 +29,7 @@ module OpenID
       # the one matching association is expired. (Is allowed to GC expired
       # associations when found.)
       def get_association(server_url, handle=nil)
-        oas = OpenidAssociation.find_all_by_target targetize(server_url)
+        oas = OpenidAssociation.by_target(key: targetize(server_url))
         return nil if oas.empty?
         unless handle.nil?
           return nil unless oas.collect(&:handle).include? handle
@@ -41,9 +41,9 @@ module OpenID
       # If there is a matching association, remove it from the store and
       # return true, otherwise return false.
       def remove_association(server_url, handle)
-        oas = OpenidAssociation.find_all_by_target targetize(server_url)
+        oas = OpenidAssociation.by_target(key: targetize(server_url)).all
         return false unless oas.collect(&:handle).include? handle
-        oas.find_all { |oa| oa.handle == handle }.each(&:delete).size > 0
+        oas.select { |oa| oa.handle == handle }.each(&:destroy).any?{|tf| tf }
       end
 
       # Return true if the nonce has not been used before, and store it
@@ -74,10 +74,10 @@ module OpenID
       # Not called during normal library operation, this method is for store
       # admins to keep their storage from filling up with expired data
       def cleanup_associations
-        oas = OpenidAssociation.all.collect do |oa|
-          oa.id if build_association(oa).expires_in == 0
+        oas = OpenidAssociation.all.all.collect do |oa|
+          oa if build_association(oa).expires_in == 0
         end
-        OpenidAssociation.delete oas.compact
+        oas.compact.map(&:destroy)
       end
 
       # Remove expired nonces from the store
@@ -86,9 +86,8 @@ module OpenID
       # admins to keep their storage from filling up with expired data
       def cleanup_nonces
         now = Time.now.to_i
-        nonces = OpenidNonce.all
-        ids = nonces.collect { |n| n.id if (n.timestamp - now).abs > Nonce.skew }
-        OpenidNonce.delete ids.compact
+        nonces = OpenidNonce.all.all.collect { |n| n if (n.timestamp - now).abs > Nonce.skew }.compact
+        nonces.map(&:destroy)
       end
 
       private
