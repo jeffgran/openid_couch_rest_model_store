@@ -1,47 +1,39 @@
-= openid_active_record_store
+= openid_couch_rest_model_store
 
-http://rubygems.org/gems/openid_active_record_store
-{Project}[http://rubygems.org/gems/openid_active_record_store]
-{Wiki}[http://wiki.github.com/raggi/openid_active_record_store/]
-{Source Code}[http://github.com/raggi/openid_active_record_store/]
-{Issues}[http://github.com/raggi/openid_active_record_store/issues]
+http://rubygems.org/gems/openid_couch_rest_model_store
 
 == DESCRIPTION:
 
-A rails engine for OpenID/Omniauth that writes to ActiveRecord for the OpenID data. Forked from an old project by Kazuyoshi Tlacaelel.
+A CouchRestModel store for OpenID, forked from a very similar ActiveRecord store written by James Tucker and Kazuyoshi Tlacaelel.
 
-== FEATURES/PROBLEMS:
-
-* Simple
-* Lowish test coverage
-* Binary column may not work well with some adapters
 
 == SYNOPSIS:
 
-    rake openid_active_record_store:install:migrations
-    rake db:migrate
-
-    # Omniauth example:
-    Rails.application.config.middleware.use(
-      OmniAuth::Strategies::GoogleApps,
-      OpenID::Store::ActiveRecord.new,
-      { :name => 'example', :domain => 'example.org' }
-    )
+    # Devise openID authenticatable example:
+    module MyApp
+      class Application < Rails::Application
+        # ...
+        config.middleware.insert_before(Warden::Manager, Rack::OpenID, OpenID::Store::CouchRestModel.new)
+        # ...
+      end
+    end
 
 == REQUIREMENTS:
 
-* Rails 3+
+* Rails ~> 3
 * OpenID
+* CouchRestModel
 
 == INSTALL:
 
-* gem install openid_active_record_store
+* gem install openid_couch_rest_model_store
+* gem "openid_couch_rest_model_store', '~> 1.0'
 
 == LICENSE:
 
 (The MIT License)
 
-Copyright (c) 2011 Kazuyoshi Tlacaelel, James Tucker, Wildfire Interactive Inc
+Copyright (c) 2011 Kazuyoshi Tlacaelel, James Tucker, Wildfire Interactive Inc, Jeff Gran
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
